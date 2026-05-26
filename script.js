@@ -1,4 +1,4 @@
-/*
+/**
  * 常用JS变量:
  * agentEvent = 代理模式下自动点击模块
  * acEvent= 无障碍模式下自动点击模块
@@ -37,7 +37,7 @@ function douyinSwipeUp() {
 /**
  * 主业务流程 恢复原始点击逻辑 修复不点击问题
  */
-function main() {
+function mainEntry() {
     // 预热页面 让无障碍节点提前加载
     sleep(800);
 
@@ -58,33 +58,33 @@ function main() {
             }
         }
         logi("分享失败,正在重试");
-            sleep(500);
-        }
-        if(!shareClickSuccess){
-            loge("多次点击分享失败，跳过当前作品");
-            return;
-        }
+        sleep(500);
+    }
+    if(!shareClickSuccess){
+        loge("多次点击分享失败，跳过当前作品");
+        return;
+    }
 
-        // 2. 点击复制链接 恢复原始逻辑 确保稳定性
-        let copySuccess = false;
-        for (var i = 0; i < 10; i++) {
-            var nodes = id("com.ss.android.ugc.aweme:id/zei").getNodeInfo(3000);
-            if (nodes && nodes.length >= 6) {
-                var targetClz = nodes[5].clz;
-                var b = nodes[5].bounds;
-                var selector = clz(targetClz).bounds(b.left, b.top, b.right, b.bottom);
-                click(selector);
-            }
-            sleep(1000);
-            if (has(text("链接已复制成功，去粘贴分享："))) {
-                logi("获取链接成功");
-                back();
-                copySuccess = true;
-                break;
-            }
-            logi("获取链接失败,正在重试");
-            sleep(500);
+    // 2. 点击复制链接 恢复原始逻辑 确保稳定性
+    let copySuccess = false;
+    for (var i = 0; i < 10; i++) {
+        var nodes = id("com.ss.android.ugc.aweme:id/zei").getNodeInfo(3000);
+        if (nodes && nodes.length >= 6) {
+            var targetClz = nodes[5].clz;
+            var b = nodes[5].bounds;
+            var selector = clz(targetClz).bounds(b.left, b.top, b.right, b.bottom);
+            click(selector);
         }
+        sleep(1000);
+        if (has(text("链接已复制成功，去粘贴分享："))) {
+            logi("获取链接成功");
+            back();
+            copySuccess = true;
+            break;
+        }
+        logi("获取链接失败,正在重试");
+        sleep(500);
+    }
     if(!copySuccess) return;
 
     // 3. 读取剪贴板 修复赋值判断BUG
@@ -342,7 +342,7 @@ let ncnnOcr = null
 //脚本停止回调
 setStopCallback(function () {
     //释放所有资源,一般不需要调用,或者放到setStopCallback中
-    logi("释放 ncnnOcr 对象")
+
     ncnnOcr && ncnnOcr.releaseAll()
 })
 //初始化自动化环境
@@ -446,6 +446,7 @@ amain()
 exit()
 ========== OCR 代码结束（取消注释即可恢复）========== */
 
+
 if (!isInDouyin()) {
     logd("当前未在抖音页面，脚本直接退出");
     toast("请在抖音内运行脚本，即将退出");
@@ -508,5 +509,5 @@ if (autoMode) {
     work();
 }else {
     logd("进入手动单次执行模式");
-    main();
+    mainEntry();
 }
